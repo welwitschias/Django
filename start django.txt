@@ -1,0 +1,51 @@
+cmd 실행 (win+r -> cmd)
+
+1. 라이브러리 설치하기
+cd C:\python\django (경로 이동)
+pip install django
+pip install mysqlclient
+
+2. 프로젝트 만들기
+django-admin startproject [프로젝트명]
+
+3. 앱 만들기
+cd .\myProject01\ (경로 이동)
+python manage.py startapp [앱명]
+
+4. 시작하기
+settings.py에서 기본설정 변경하기
+- DATABASES (mysql로 변경)
+DATABASES = {
+    "default": {
+        "ENGINE": "django.db.backends.mysql",
+        "NAME": "djangodb", (이름 알아서)
+        "USER": "root",
+        "PASSWORD": "1234",
+        "HOST": "localhost",
+        "PORT": "3306"
+    }
+}
+
+- 인코딩 설정변경
+LANGUAGE_CODE = "ko"
+TIME_ZONE = "Asia/Seoul"
+USE_TZ = False
+
+- INSTALLED_APPS (3에서 만든 앱명 추가)
+
+5. db, server 연동하기
+cmd창 다시 돌아오기
+python manage.py makemigrations
+python manage.py migrate
+
+python manage.py runserver
+(ctrl+c로 빠져나올 수 있음)
+
+6. localhost:8000 접속하여 성공 페이지 확인하기
+
+7. models.py 에서 class(db table) 만들고
+python manage.py makemigrations
+python manage.py migrate
+입력 후 db table 생성 확인하기
+
+8. urls.py 에서 접속 url 설정
