@@ -34,6 +34,7 @@ USE_TZ = False
 - INSTALLED_APPS (3에서 만든 앱명 추가)
 
 5. db, server 연동하기
+mysql에서 4에서 설정한 name으로 schema 생성하기
 cmd창 다시 돌아오기
 python manage.py makemigrations
 python manage.py migrate
