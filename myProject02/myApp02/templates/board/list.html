@@ -1,0 +1,107 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+<div class="container">
+    <!-- mb-3 : margin-bottom-3px, mr-3 : margin-right-3px -->
+    <div class="d-flex justify-content-end mb-3">
+        <form action="/list" method="get" class="form-inline mr-3">
+            <select class="form-control mr-sm-1" id="field" name="field">
+                <option value="writer">작성자</option>
+                <option value="title">제목</option>
+                <option value="content">내용</option>
+                <option value="all">모두</option>
+                <script>
+                    $("#field").val("{{field}}");
+                </script>
+            </select>
+            <input type="text" class="form-control mr-sm-1" id="word" placeholder="Search" name="word" value="{{word}}">
+            <button type="submit" class="btn btn-primary">검색</button>
+        </form>
+    </div>
+    <br />
+
+    <h2 style="text-align: center">
+        <a href="/list">게시판</a> (게시글: {{boardCount}}개)
+    </h2>
+    <br />
+
+    <table class="table table-hover" style="text-align: center">
+      <thead class="bg-primary" style="color: white">
+        <tr>
+            <th>No</th>
+            <th>작성자</th>
+            <th>제목</th>
+            <th>작성일</th>
+            <th>조회수</th>
+            <th>첨부파일</th>
+            <th>다운로드</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for board in boardList %}
+        <tr>
+          <td>{{board.id}}</td>
+          <td>{{board.writer}}</td>
+          <td><a href="/detail/{{board.id}}">{{board.title}}</a></td>
+          <td>{{board.post_date | date:'Y-m-d H:m'}}</td>
+          <td>{{board.hit}}</td>
+          <td>
+            {% if board.filesize > 0 %}
+            <span class="_imgs" data-url="/download_count?id={{board.id}}">
+                <img src="{% static 'images/download.svg' %}" style="width: 24px; cursor: pointer;">
+            </span>
+            {% endif %}
+          </td>
+          <td class="_downCnt">{{board.down}}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    
+    <ul class="pagination" style="justify-content: center">
+        {% if startPage > blockPage %}
+        <li class="page-item">  
+            <a class="page-link" href="?page={{startPage|add:-3}}&field={{field}}&word={{word}}">이전</a>
+        </li>
+        {% endif %}
+
+        {% for i in range %}
+        {% if i == currentPage %}
+        <li class="page-item active">
+            <a class="page-link" href="#">{{i}}</a>
+        </li>
+        {% else %}
+        <li class="page-item">
+            <a class="page-link" href="?page={{i}}&field={{field}}&word={{word}}">{{i}}</a>
+        </li>
+        {% endif %}
+        {% endfor %}
+
+        {% if endPage < totalPage %}
+        <li class="page-item">
+            <a class="page-link" href="?page={{endPage|add:1}}&field={{field}}&word={{word}}">다음</a>
+        </li>
+        {% endif %}
+    </ul>
+</div>
+{% endblock %}
+
+{% block script %}
+<script>
+    $("._imgs").on("click", function () {
+        _imgs = $(this);
+        $.ajax({
+            type: "GET",
+            // url: $(this).attr("data-url"),
+            url: $(this).data("url"),
+            success: function (data) {
+                _imgs.parent().parent().find("._downCnt").text(data.count);
+                location.href = "/download?id=" + data.id;
+            },
+            error: function (e) {
+                alert(e);
+            },
+        });
+    });
+</script>
+{% endblock %}

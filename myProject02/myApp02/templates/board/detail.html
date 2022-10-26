@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+<h3 style="text-align: center">상세보기</h3>
+<br />
+
+<div class="container" style="width: 800px">
+  <table class="table table-bordered align-middle" style="text-align: center">
+    <tbody>
+      <tr>
+        <th scope="row">
+          <h4><span class="badge badge-success">No</span></h4>
+        </th>
+        <td>{{dto.id}}</td>
+      </tr>
+      <tr>
+        <th scope="row">
+          <h4><span class="badge badge-success">조회수</span></h4>
+        </th>
+        <td>{{dto.hit}}</td>
+      </tr>
+      <tr>
+        <th scope="row">
+          <h4><span class="badge badge-success">작성자</span></h4>
+        </th>
+        <td>{{dto.writer}}</td>
+      </tr>
+      <tr>
+        <th scope="row">
+          <h4><span class="badge badge-success">제목</span></h4>
+        </th>
+        <td>{{dto.title}}</td>
+      </tr>
+      <tr>
+        <th scope="row">
+          <h4><span class="badge badge-success">내용</span></h4>
+        </th>
+        <td>{{dto.content}}</td>
+      </tr>
+      <tr>
+        <th scope="row">
+          <h4><span class="badge badge-success">작성일</span></h4>
+        </th>
+        <td>{{dto.post_date | date:'Y-m-d H:m'}}</td>
+      </tr>
+      <tr>
+        <th scope="row">
+          <h4><span class="badge badge-success">첨부파일</span></h4>
+        </th>
+        <td>{{dto.filename}}</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="container" style="text-align: center">
+  <button type="button" class="btn btn-secondary mr-sm-1">수정</button>
+  <button type="button" class="btn btn-danger mr-sm-1">삭제</button>
+</div>
+{% endblock %}
