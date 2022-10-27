@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
 {% load static %}
 {% load humanize %}
+
 {% block content %}
 <style>
   .col-sm-2 {
@@ -14,43 +15,43 @@
 <div class="container" style="width: 800px">
   <div class="container">
     <p>
-      <span class="badge badge-success col-sm-2">No</span>
+      <span class="badge badge-primary col-sm-2">No</span>
       <span class="col-sm-6">{{dto.id}}</span>
     </p>
     <hr />
 
     <p>
-      <span class="badge badge-success col-sm-2">조회수</span>
+      <span class="badge badge-primary col-sm-2">조회수</span>
       <span class="col-sm-6">{{dto.hit}}</span>
     </p>
     <hr />
 
     <p>
-      <span class="badge badge-success col-sm-2">작성자</span>
+      <span class="badge badge-primary col-sm-2">작성자</span>
       <span class="col-sm-6">{{dto.writer}}</span>
     </p>
     <hr />
 
     <p>
-      <span class="badge badge-success col-sm-2">제목</span>
+      <span class="badge badge-primary col-sm-2">제목</span>
       <span class="col-sm-6">{{dto.title}}</span>
     </p>
     <hr />
 
     <p>
-      <span class="badge badge-success col-sm-2">내용</span>
+      <span class="badge badge-primary col-sm-2">내용</span>
       <span class="col-sm-6">{{dto.content}}</span>
     </p>
     <hr />
 
     <p>
-      <span class="badge badge-success col-sm-2">작성일</span>
+      <span class="badge badge-primary col-sm-2">작성일</span>
       <span class="col-sm-6">{{dto.post_date | date:'Y-m-d H:m'}}</span>
     </p>
     <hr />
 
     <p>
-      <span class="badge badge-success col-sm-2">첨부파일</span>
+      <span class="badge badge-primary col-sm-2">첨부파일</span>
       <span class="col-sm-6">
         {{dto.filename}}
         {% if dto.filesize > 0 %}
@@ -83,21 +84,23 @@
     </div>
   </div>
 
-  <!-- comment count -->
-  <div class="mt-5">Comment ({{dto.comment_set.count}})</div>
-
-  <!-- comment list -->
-  <div>
-  {% if dto.comment_set.count > 0 %}
-  <div>
-    {% for comment in dto.comment_set.all %}
-      <div class="py-1 text-muted">
-        <span>{{comment.content}}</span>
-        <span>// {{comment.writer}} // {{comment.post_date | date:'Y-m-d H:m'}}</span>
-      </div>
-    {% endfor %}
-  </div>
-  {% endif %}
+  <div class="container">
+    <div class="mt-5">
+      Comment ({{dto.comment_set.count}})
+    </div>
+  
+    <div>
+    {% if dto.comment_set.count > 0 %}
+    <div>
+      {% for comment in dto.comment_set.all %}
+        <div class="py-1 text-muted">
+          <span>{{comment.content}}</span>
+          <span>// {{comment.writer}} // {{comment.post_date | date:'Y-m-d H:m'}}</span>
+        </div>
+      {% endfor %}
+    </div>
+    {% endif %}
+    </div>
   </div>
 </div>
 {% endblock %}

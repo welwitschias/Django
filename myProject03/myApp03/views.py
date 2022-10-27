@@ -3,9 +3,11 @@ from django.views.decorators.csrf import csrf_exempt
 from django.http.response import JsonResponse, HttpResponse
 from django.db.models import Q
 from django.core.paginator import Paginator
-from myApp02.models import Board, Comment
-import math
+from myApp03.models import Board, Comment
+from myApp03 import bigdataProcess
 import urllib.parse
+from .forms import UserForm
+from django.contrib.auth import authenticate, login
 
 # Create your views here.
 UPLOAD_DIR = "C:/python/django/upload/"
@@ -46,69 +48,6 @@ def insert(request):
 def list(request):
     page = request.GET.get('page', 1)
     word = request.GET.get('word', '')
-    field = request.GET.get('field', 'title')
-
-    if field == 'all':
-        boardCount = Board.objects.filter(Q(writer__contains=word) |
-                                          Q(title__contains=word) |
-                                          Q(content__contains=word)).count()
-    elif field == 'writer':
-        boardCount = Board.objects.filter(Q(writer__contains=word)).count()
-    elif field == 'title':
-        boardCount = Board.objects.filter(Q(title__contains=word)).count()
-    elif field == 'content':
-        boardCount = Board.objects.filter(Q(content__contains=word)).count()
-    else:
-        boardCount = Board.objects.all().count()
-
-    pageSize = 5
-    blockPage = 3
-    currentPage = int(page)
-
-    start = (currentPage - 1) * pageSize
-    totalPage = math.ceil(boardCount / pageSize)
-    startPage = math.floor((currentPage - 1) / blockPage) * blockPage + 1
-    endPage = startPage + blockPage - 1
-
-    if endPage > totalPage:
-        endPage = totalPage
-
-    if field == 'all':
-        boardList = Board.objects.filter(Q(writer__contains=word) |
-                                         Q(title__contains=word) |
-                                         Q(content__contains=word)).order_by('-id')[start: start + pageSize]
-    elif field == 'writer':
-        boardList = Board.objects.filter(
-            Q(writer__contains=word)).order_by('-id')[start: start + pageSize]
-    elif field == 'title':
-        boardList = Board.objects.filter(
-            Q(title__contains=word)).order_by('-id')[start: start + pageSize]
-    elif field == 'content':
-        boardList = Board.objects.filter(
-            Q(content__contains=word)).order_by('-id')[start: start + pageSize]
-    else:
-        boardList = Board.objects.all().order_by(
-            '-id')[start: start + pageSize]
-
-    # 게시판 번호 처리
-    rowNo = boardCount - (int(page)-1) * pageSize
-    context = {'startPage': startPage,
-               'blockPage': blockPage,
-               'endPage': endPage,
-               'totalPage': totalPage,
-               'boardCount': boardCount,
-               'boardList': boardList,
-               'currentPage': currentPage,
-               'field': field,
-               'word': word,
-               'rowNo': rowNo,
-               'range': range(startPage, endPage+1)}
-    return render(request, 'board/list.html', context)
-
-
-def list_page(request):
-    page = request.GET.get('page', 1)
-    word = request.GET.get('word', '')
 
     boardCount = Board.objects.filter(Q(writer__contains=word) |
                                       Q(title__contains=word) |
@@ -117,12 +56,9 @@ def list_page(request):
                                      Q(title__contains=word) |
                                      Q(content__contains=word)).order_by('-id')
 
-    # 페이징 처리
     pageSize = 5
     paginator = Paginator(boardList, pageSize)
     pageList = paginator.get_page(page)
-
-    # 게시판 번호 처리
     rowNo = boardCount - (int(page)-1) * pageSize
 
     context = {'pageList': pageList,
@@ -130,7 +66,7 @@ def list_page(request):
                'page': page,
                'word': word,
                'rowNo': rowNo}
-    return render(request, 'board/list_page.html', context)
+    return render(request, 'board/list.html', context)
 
 
 def download_count(request):
@@ -210,3 +146,29 @@ def comment_insert(request):
     dto = Comment(board_id=id, writer='joker', content=request.POST['comment'])
     dto.save()
     return redirect('/detail/'+id)
+
+
+def signup(request):    # 회원가입
+    if request.method == "POST":    # 회원가입 성공
+        form = UserForm(request.POST)
+        if form.is_valid():
+            print('signup POST valid')
+            form.save()
+
+            username = form.cleaned_data.get('username')
+            raw_password = form.cleaned_data.get('password1')
+            user = authenticate(username=username, password=raw_password)
+            login(request, user)
+
+            return redirect('/')
+        else:
+            print('signup POST unvalid')
+
+    else:   # 회원가입 폼으로 이동
+        form = UserForm()
+    return render(request, 'common/signup.html', {'form': form})
+
+
+def melon(request):
+    bigdataProcess.melon_crawling()
+    return render(request, 'bigdata/melon.html')
