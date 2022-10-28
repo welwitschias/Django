@@ -1,11 +1,12 @@
 from datetime import datetime
 from django.db import models
+from django.contrib.auth.models import User
 
 # Create your models here.
 
 
 class Board(models.Model):
-    writer = models.CharField(null=False, max_length=50)
+    writer = models.ForeignKey(User, on_delete=models.CASCADE)
     title = models.CharField(null=False, max_length=200)
     content = models.TextField(null=False)
     hit = models.IntegerField(default=0)
@@ -24,6 +25,14 @@ class Board(models.Model):
 
 class Comment(models.Model):
     board = models.ForeignKey(Board, on_delete=models.CASCADE)
-    writer = models.CharField(null=False, max_length=50)
+    writer = models.ForeignKey(User, on_delete=models.CASCADE)
     content = models.TextField(null=False)
     post_date = models.DateTimeField(default=datetime.now, blank=True)
+
+
+class Forecast(models.Model):
+    city = models.CharField(null=False, max_length=500)
+    tmef = models.TextField(null=True)
+    wf = models.TextField(null=True)
+    tmn = models.IntegerField(default=0)
+    tmx = models.IntegerField(default=0)

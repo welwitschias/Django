@@ -1,13 +1,16 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.views.decorators.csrf import csrf_exempt
 from django.http.response import JsonResponse, HttpResponse
 from django.db.models import Q
 from django.core.paginator import Paginator
-from myApp03.models import Board, Comment
+from myApp03.models import Board, Comment, Forecast
 from myApp03 import bigdataProcess
 import urllib.parse
 from .forms import UserForm
 from django.contrib.auth import authenticate, login
+from django.db.models.aggregates import Count
+import pandas as pd
+from django.contrib.auth.decorators import login_required
 
 # Create your views here.
 UPLOAD_DIR = "C:/python/django/upload/"
@@ -17,7 +20,8 @@ def base(request):
     return render(request, 'base.html')
 
 
-def insert_form(request):
+@login_required(login_url="/login")
+def insert_form(request):   # 로그인 된 사용자만 사용할 수 있도록 설정
     return render(request, 'board/insert.html')
 
 
@@ -36,7 +40,7 @@ def insert(request):
             fp.write(chunk)
         fp.close()
 
-    dto = Board(writer=request.POST['writer'],
+    dto = Board(writer=request.user,
                 title=request.POST['title'],
                 content=request.POST['content'],
                 filename=fname,
@@ -49,10 +53,11 @@ def list(request):
     page = request.GET.get('page', 1)
     word = request.GET.get('word', '')
 
-    boardCount = Board.objects.filter(Q(writer__contains=word) |
+    boardCount = Board.objects.filter(Q(writer__username__contains=word) |
                                       Q(title__contains=word) |
                                       Q(content__contains=word)).count()
-    boardList = Board.objects.filter(Q(writer__contains=word) |
+    
+    boardList = Board.objects.filter(Q(writer__username__contains=word) |
                                      Q(title__contains=word) |
                                      Q(content__contains=word)).order_by('-id')
 
@@ -100,6 +105,7 @@ def detail(request, board_id):
     return render(request, 'board/detail.html', context)
 
 
+@login_required(login_url="/login")
 def update_form(request, board_id):
     dto = Board.objects.get(id=board_id)
     return render(request, 'board/update.html', {'dto': dto})
@@ -124,7 +130,7 @@ def update(request):
         fp.close()
 
     update_dto = Board(id,
-                       writer=request.POST['writer'],
+                       writer=request.user,
                        title=request.POST['title'],
                        content=request.POST['content'],
                        hit=hitcount,
@@ -134,6 +140,7 @@ def update(request):
     return redirect('/list')
 
 
+@login_required(login_url="/login")
 def delete(request, board_id):
     dto = Board.objects.get(id=board_id)
     dto.delete()
@@ -141,9 +148,13 @@ def delete(request, board_id):
 
 
 @csrf_exempt
+@login_required(login_url="/login")
 def comment_insert(request):
     id = request.POST['id']
-    dto = Comment(board_id=id, writer='joker', content=request.POST['comment'])
+    board = get_object_or_404(Board, pk=id)
+    dto = Comment(board=board,
+                  writer=request.user,
+                  content=request.POST['comment'])
     dto.save()
     return redirect('/detail/'+id)
 
@@ -170,5 +181,35 @@ def signup(request):    # 회원가입
 
 
 def melon(request):
-    bigdataProcess.melon_crawling()
-    return render(request, 'bigdata/melon.html')
+    datas = []
+    bigdataProcess.melon_crawling(datas)
+    return render(request, 'bigdata/melon_chart.html', {'datas': datas})
+
+
+def weather(request):
+    last_date = Forecast.objects.values('tmef').order_by('-tmef')[:1]
+    weather = {}
+    bigdataProcess.weather_crawling(last_date, weather)
+
+    # insert db
+    for i in weather:
+        for j in weather[i]:
+            dto = Forecast(city=i, tmef=j[0], wf=j[1], tmn=j[2], tmx=j[3])
+            dto.save()
+
+    # 부산 select
+    result = Forecast.objects.filter(city='부산')
+    result1 = Forecast.objects.filter(city='부산').values(
+        'wf').annotate(dcount=Count('wf')).values('dcount', 'wf')
+
+    # print sql
+    print("-"*100)
+    print('result :', str(result.query))
+    print("-"*100)
+    print('result1 :', str(result1.query))
+    print("-"*100)
+
+    df = pd.DataFrame(result1)
+    image_dic = bigdataProcess.weather_make_chart(result, df.wf, df.dcount)
+
+    return render(request, 'bigdata/weather_chart.html', {'img_data': image_dic})

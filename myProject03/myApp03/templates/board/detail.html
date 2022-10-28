@@ -28,7 +28,7 @@
 
     <p>
       <span class="badge badge-primary col-sm-2">작성자</span>
-      <span class="col-sm-6">{{dto.writer}}</span>
+      <span class="col-sm-6">{{dto.writer.username}}</span>
     </p>
     <hr />
 
@@ -63,12 +63,20 @@
   </div>
 
   <div class="container" style="text-align: center">
-    <button type="button" class="btn btn-secondary mr-sm-1 _update" data-url="/update_form/{{dto.id}}">
+    {% if dto.writer.username == user.username %}
+    <button
+      type="button"
+      class="btn btn-secondary mr-sm-1 _update"
+      data-url="/update_form/{{dto.id}}">
       수정
     </button>
-    <button type="button" class="btn btn-danger _delete" data-url="/delete/{{dto.id}}">
+    <button
+      type="button"
+      class="btn btn-danger _delete"
+      data-url="/delete/{{dto.id}}">
       삭제
     </button>
+    {% endif %}
   </div>
 
   <div class="container">
@@ -77,7 +85,12 @@
         <input type="hidden" name="id" value="{{dto.id}}" />
         <div class="form-group">
           <label for="comment">Comment:</label>
-          <textarea class="form-control" id="comment" rows="3" placeholder="Enter comment" name="comment"></textarea>
+          <textarea
+            class="form-control"
+            id="comment"
+            rows="3"
+            placeholder="Enter comment"
+            name="comment"></textarea>
         </div>
         <button type="submit" class="btn btn-primary btn-sm">답글 작성</button>
       </form>
@@ -85,21 +98,22 @@
   </div>
 
   <div class="container">
-    <div class="mt-5">
-      Comment ({{dto.comment_set.count}})
-    </div>
-  
+    <div class="mt-5">Comment ({{dto.comment_set.count}})</div>
+
     <div>
-    {% if dto.comment_set.count > 0 %}
-    <div>
-      {% for comment in dto.comment_set.all %}
+      {% if dto.comment_set.count > 0 %}
+      <div>
+        {% for comment in dto.comment_set.all %}
         <div class="py-1 text-muted">
           <span>{{comment.content}}</span>
-          <span>// {{comment.writer}} // {{comment.post_date | date:'Y-m-d H:m'}}</span>
+          <p style="text-align: right">
+            <span class="badge badge-pill badge-info mr-3">{{comment.writer}}</span>
+            <span>{{comment.post_date | date:'Y-m-d H:m'}}</span>
+          </p>
         </div>
-      {% endfor %}
-    </div>
-    {% endif %}
+        {% endfor %}
+      </div>
+      {% endif %}
     </div>
   </div>
 </div>
@@ -108,12 +122,12 @@
 {% block script %}
 <script>
   $("._update").on("click", function () {
-    alert('정말 수정하겠습니까?');
+    alert("정말 수정하겠습니까?");
     location.href = $(this).data("url");
   });
 
   $("._delete").on("click", function () {
-    alert('정말 삭제하겠습니까?');
+    alert("정말 삭제하겠습니까?");
     location.href = $(this).data("url");
   });
 </script>

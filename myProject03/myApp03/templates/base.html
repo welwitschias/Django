@@ -1,55 +1,70 @@
 {% load static %}
+
 <!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="stylesheet" type="text/css" href="{% static 'css/bootstrap.min.css' %}" />
-    <script src="{% static 'js/bootstrap.min.js' %}"></script>
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="{% static 'css/bootstrap.min.css' %}" />
     <script src="{% static 'jquery-3.6.1.min.js' %}"></script>
+    <script src="{% static 'js/bootstrap.min.js' %}"></script>
     <title>Django</title>
   </head>
+
   <body>
     <nav class="navbar navbar-expand-sm bg-primary navbar-dark">
       <ul class="navbar-nav mr-auto">
         <li class="nav-item active">
           <a class="nav-link" href="/">홈</a>
         </li>
+
         <li class="nav-item active">
           <a class="nav-link" href="/list">게시판</a>
         </li>
+
         <li class="nav-item active">
           <a class="nav-link" href="/insert_form">글쓰기</a>
         </li>
+
         <li class="nav-item active">
           <a class="nav-link" href="/melon">노래순위</a>
+        </li>
+
+        <li class="nav-item active">
+          <a class="nav-link" href="/weather">날씨정보</a>
         </li>
       </ul>
 
       <ul class="navbar-nav">
         {% if user.is_authenticated %}
         <li class="nav-item active">
-          <a class="nav-link" href="/logout">({{user.username}}님 환영합니다) 로그아웃</a>
+          <a class="nav-link" href="/logout">
+            ({{user.username}}님 환영합니다) 로그아웃
+          </a>
         </li>
         {% else %}
         <li class="nav-item active">
           <a class="nav-link" href="/login">로그인</a>
         </li>
+
         <li class="nav-item active">
           <a class="nav-link" href="/signup">회원가입</a>
         </li>
         {% endif %}
       </ul>
     </nav>
-    <br/>
+    <br />
 
     {% block content %}
     <div style="text-align: center">
-      <img src="{% static 'images/homeimg.jpg' %}" style="height: 85vh">
+      <img src="{% static 'images/homeimg.jpg' %}" style="height: 85vh" />
     </div>
     {% endblock %}
-
+    
     {% block script %}
     {% endblock %}
   </body>

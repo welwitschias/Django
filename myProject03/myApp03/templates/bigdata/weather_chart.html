@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+<style>
+  .container {
+    text-align: center;
+  }
+
+  img {
+    width: 100%;
+  }
+</style>
+
+<div class="container">
+  <h2>부산의 날씨</h2>
+  <!-- <img src="{% static '/images/weather_plot.png' %}" /> -->
+  <img src="{% get_static_prefix %}images/{{img_data.plot}}" />
+  <img src="{% get_static_prefix %}images/{{img_data.bar}}" />
+  <img src="{% get_static_prefix %}images/{{img_data.pie}}" />
+</div>
+{% endblock %}
