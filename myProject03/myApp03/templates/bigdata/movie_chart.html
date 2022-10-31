@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+<style>
+  .container {
+    text-align: center;
+  }
+
+  img {
+    width: 100%;
+  }
+</style>
+
+<div class="container">
+  <table class="table table-hover" style="text-align: center">
+    <thead class="bg-primary" style="color: white">
+      <tr>
+        <th>순위</th>
+        <th>제목</th>
+        <th>평점</th>
+        <th>예매율</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      {% for item in datas %}
+      <tr>
+        <td>{{item.movieRanking}}</td>
+        <td>{{item.movieTitle}}</td>
+        <td>{{item.movieGrade}}</td>
+        <td>{{item.movieReserv}}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+<div class="container">
+  <img src="{% static '/images/movie_pie.png' %}" />
+</div>
+{% endblock %}

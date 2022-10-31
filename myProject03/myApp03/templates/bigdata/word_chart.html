@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+<style>
+  div {
+    text-align: center;
+  }
+  img {
+    height: 90vh;
+  }
+</style>
+
+<div>
+  <img src="{% get_static_prefix %}images/{{img_data}}" />
+</div>
+{% endblock %}

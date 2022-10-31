@@ -18,7 +18,6 @@ from django.contrib.auth import views as auth_views
 from django.urls import path
 from myApp03 import views
 
-
 urlpatterns = [
     path("admin/", admin.site.urls),
 
@@ -45,7 +44,10 @@ urlpatterns = [
     path('signup/', views.signup),
     path('login/', auth_views.LoginView.as_view(template_name='common/login.html'), name='login'),
     path('logout/', auth_views.LogoutView.as_view(), name='logout'),
-    
+
     path('melon/', views.melon),
-    path('weather/', views.weather)
+    path('weather/', views.weather),
+    path('map/', views.map),
+    path('wordcloud/', views.wordcloud),
+    path('movie/', views.movie)
 ]

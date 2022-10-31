@@ -1,16 +1,20 @@
-from django.shortcuts import render, redirect, get_object_or_404
-from django.views.decorators.csrf import csrf_exempt
-from django.http.response import JsonResponse, HttpResponse
-from django.db.models import Q
-from django.core.paginator import Paginator
-from myApp03.models import Board, Comment, Forecast
-from myApp03 import bigdataProcess
+import json
 import urllib.parse
-from .forms import UserForm
-from django.contrib.auth import authenticate, login
-from django.db.models.aggregates import Count
+
 import pandas as pd
+from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import login_required
+from django.core.paginator import Paginator
+from django.db.models import Q
+from django.db.models.aggregates import Count
+from django.http.response import HttpResponse, JsonResponse
+from django.shortcuts import get_object_or_404, redirect, render
+from django.views.decorators.csrf import csrf_exempt
+
+from myApp03 import bigdataProcess
+from myApp03.models import Board, Comment, Forecast
+
+from .forms import UserForm
 
 # Create your views here.
 UPLOAD_DIR = "C:/python/django/upload/"
@@ -56,7 +60,7 @@ def list(request):
     boardCount = Board.objects.filter(Q(writer__username__contains=word) |
                                       Q(title__contains=word) |
                                       Q(content__contains=word)).count()
-    
+
     boardList = Board.objects.filter(Q(writer__username__contains=word) |
                                      Q(title__contains=word) |
                                      Q(content__contains=word)).order_by('-id')
@@ -213,3 +217,22 @@ def weather(request):
     image_dic = bigdataProcess.weather_make_chart(result, df.wf, df.dcount)
 
     return render(request, 'bigdata/weather_chart.html', {'img_data': image_dic})
+
+
+def map(request):
+    bigdataProcess.map()
+    return render(request, 'bigdata/map.html')
+
+
+def wordcloud(request):
+    word_path = "C:/python/django/myProject03/data/"
+    data = json.loads(open(word_path+'4차 산업혁명.json',
+                      'r', encoding='utf-8').read())
+    bigdataProcess.make_wordcloud(data)
+    return render(request, 'bigdata/word_chart.html', {'img_data': 'k_wordcloud.png'})
+
+
+def movie(request):
+    datas = []
+    bigdataProcess.movie_crawling(datas)
+    return render(request, 'bigdata/movie_chart.html', {'datas': datas})

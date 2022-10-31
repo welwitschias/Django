@@ -50,3 +50,8 @@ python manage.py migrate
 입력 후 db table 생성 확인하기
 
 8. urls.py 에서 접속 url 설정
+
+===============================================
+* wordcloud 정규표현식 에러났을 때 해결(버전 다운)
+- pip uninstall pillow
+- pip install pillow==8.0.1

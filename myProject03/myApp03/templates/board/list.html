@@ -5,7 +5,7 @@
 {% block content %}
 <div class="container">
   <div class="d-flex justify-content-end mb-3">
-    <form action="/list" method="get" class="form-inline mr-3">
+    <form action="/list" method="get" class="form-inline mr-1">
       <input
         type="text"
         class="form-control mr-sm-1"
@@ -15,6 +15,7 @@
         value="{{word}}" />
       <button type="submit" class="btn btn-primary">검색</button>
     </form>
+    <a class="btn btn-info" href="/insert_form">글쓰기</a>
   </div>
   <br />
 
